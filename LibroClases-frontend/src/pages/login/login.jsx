@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 
 const DEMO_CREDENTIALS = [
-  { role: 'Docente',       email: 'profesor@colegio.cl' },
+  { role: 'Docente',       email: 'profesor@colegio.com' },
   { role: 'Estudiante',    email: 'estudiante@colegio.cl' },
   { role: 'Administrador', email: 'admin@colegio.cl' },
   { role: 'Apoderado',     email: 'apoderado@colegio.cl' },
@@ -19,7 +19,7 @@ export default function LoginPage() {
   const [loading, setLoading]   = useState(false);
   const [showPass, setShowPass] = useState(false);
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
     if (!email || !password) {
@@ -27,16 +27,13 @@ export default function LoginPage() {
       return;
     }
     setLoading(true);
-    // Simulate async (ready for real API swap)
-    setTimeout(() => {
-      const result = login(email, password);
-      if (result.success) {
-        navigate('/dashboard');
-      } else {
-        setError(result.error);
-        setLoading(false);
-      }
-    }, 600);
+    const result = await login(email, password);
+    if (result.success) {
+      navigate('/dashboard');
+    } else {
+      setError(result.error);
+      setLoading(false);
+    }
   };
 
   const fillDemo = (demoEmail) => {
