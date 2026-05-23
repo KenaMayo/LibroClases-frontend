@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 
 const DEMO_CREDENTIALS = [
-  { role: 'Docente',       email: 'profesor@colegio.com' },
+  { role: 'Docente',       email: 'profesor@colegio.cl' },
   { role: 'Estudiante',    email: 'estudiante@colegio.cl' },
   { role: 'Administrador', email: 'admin@colegio.cl' },
   { role: 'Apoderado',     email: 'apoderado@colegio.cl' },
