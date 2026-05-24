@@ -1,9 +1,8 @@
 {
   "name": "libroclases-frontend",
-  "version": "0.0.0",
   "private": true,
+  "version": "0.0.0",
   "type": "module",
-  "homepage": "https://KenaMayo.github.io/LibroClases-frontend",
   "scripts": {
     "dev": "vite",
     "build": "vite build",
