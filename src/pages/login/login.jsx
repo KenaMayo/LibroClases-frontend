@@ -9,6 +9,8 @@ const DEMO_CREDENTIALS = [
   { role: 'Apoderado',     email: 'apoderado@colegio.cl' },
 ];
 
+const API_URL = import.meta.env.VITE_API_URL;
+
 export default function LoginPage() {
   const { login } = useAuth();
   const navigate = useNavigate();
@@ -21,17 +23,59 @@ export default function LoginPage() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+
     setError('');
+
     if (!email || !password) {
       setError('Por favor, completa todos los campos.');
       return;
     }
+
     setLoading(true);
-    const result = await login(email, password);
-    if (result.success) {
-      navigate('/dashboard');
-    } else {
-      setError(result.error);
+
+    try {
+
+      const response = await fetch(`${API_URL}/auth/login`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+
+        body: JSON.stringify({
+          email,
+          password,
+        }),
+      });
+
+      const data = await response.json();
+
+      if (response.ok) {
+
+        // guardar token
+        if (data.token) {
+          localStorage.setItem('token', data.token);
+        }
+
+        // guardar usuario
+        if (data.user) {
+          localStorage.setItem('user', JSON.stringify(data.user));
+        }
+
+        // login context
+        if (login) {
+          await login(email, password);
+        }
+
+        navigate('/dashboard');
+
+      } else {
+        setError(data.message || 'Correo o contraseña incorrectos');
+      }
+
+    } catch (err) {
+      console.error(err);
+      setError('No se pudo conectar con el servidor');
+    } finally {
       setLoading(false);
     }
   };
@@ -56,6 +100,7 @@ export default function LoginPage() {
             Colegio Bernardo O&apos;Higgins
           </span>
         </div>
+
         <a
           href="#"
           className="text-white-50 text-decoration-none small"
@@ -78,9 +123,11 @@ export default function LoginPage() {
             >
               <i className="bi bi-mortarboard-fill text-white" style={{ fontSize: '1.9rem' }}></i>
             </div>
+
             <h1 className="h5 fw-bold mb-1" style={{ color: '#002855' }}>
               Libro de Clases Digital
             </h1>
+
             <p className="text-muted mb-0" style={{ fontSize: '0.83rem' }}>
               Sistema de Gestión Académica
             </p>
@@ -89,6 +136,7 @@ export default function LoginPage() {
           {/* Login card */}
           <div className="card border-0 shadow rounded-3">
             <div className="card-body p-4">
+
               <h2 className="h6 fw-semibold mb-4" style={{ color: '#002855' }}>
                 Iniciar sesión
               </h2>
@@ -101,11 +149,13 @@ export default function LoginPage() {
               )}
 
               <form onSubmit={handleSubmit} noValidate>
+
                 {/* Email */}
                 <div className="mb-3">
                   <label htmlFor="login-email" className="form-label small fw-semibold mb-1">
                     Correo electrónico
                   </label>
+
                   <input
                     id="login-email"
                     type="email"
@@ -120,14 +170,22 @@ export default function LoginPage() {
 
                 {/* Password */}
                 <div className="mb-4">
+
                   <div className="d-flex justify-content-between align-items-center mb-1">
                     <label htmlFor="login-password" className="form-label small fw-semibold mb-0">
                       Contraseña
                     </label>
-                    <a href="#" className="small text-decoration-none" style={{ color: '#005eb8', fontSize: '0.8rem' }} onClick={(e) => e.preventDefault()}>
+
+                    <a
+                      href="#"
+                      className="small text-decoration-none"
+                      style={{ color: '#005eb8', fontSize: '0.8rem' }}
+                      onClick={(e) => e.preventDefault()}
+                    >
                       ¿Olvidaste tu contraseña?
                     </a>
                   </div>
+
                   <div className="input-group">
                     <input
                       id="login-password"
@@ -138,6 +196,7 @@ export default function LoginPage() {
                       onChange={(e) => setPassword(e.target.value)}
                       autoComplete="current-password"
                     />
+
                     <button
                       type="button"
                       className="btn btn-outline-secondary border-start-0"
@@ -157,7 +216,16 @@ export default function LoginPage() {
                   disabled={loading}
                 >
                   {loading
-                    ? (<><span className="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>Ingresando...</>)
+                    ? (
+                      <>
+                        <span
+                          className="spinner-border spinner-border-sm me-2"
+                          role="status"
+                          aria-hidden="true"
+                        ></span>
+                        Ingresando...
+                      </>
+                    )
                     : 'Ingresar'}
                 </button>
               </form>
@@ -171,6 +239,7 @@ export default function LoginPage() {
                 <i className="bi bi-info-circle me-1"></i>
                 Acceso de demostración <span className="fw-normal">(contraseña: <code>1234</code>)</span>
               </p>
+
               <div className="row g-2">
                 {DEMO_CREDENTIALS.map((c) => (
                   <div className="col-6" key={c.role}>
@@ -190,10 +259,19 @@ export default function LoginPage() {
 
           {/* Footer links */}
           <div className="text-center mt-4" style={{ fontSize: '0.78rem' }}>
-            <a href="#" className="text-muted text-decoration-none me-3" onClick={(e) => e.preventDefault()}>Términos de uso</a>
-            <a href="#" className="text-muted text-decoration-none me-3" onClick={(e) => e.preventDefault()}>Política de privacidad</a>
-            <a href="#" className="text-muted text-decoration-none" onClick={(e) => e.preventDefault()}>Contacto</a>
+            <a href="#" className="text-muted text-decoration-none me-3" onClick={(e) => e.preventDefault()}>
+              Términos de uso
+            </a>
+
+            <a href="#" className="text-muted text-decoration-none me-3" onClick={(e) => e.preventDefault()}>
+              Política de privacidad
+            </a>
+
+            <a href="#" className="text-muted text-decoration-none" onClick={(e) => e.preventDefault()}>
+              Contacto
+            </a>
           </div>
+
           <p className="text-center text-muted mt-2 mb-0" style={{ fontSize: '0.75rem' }}>
             © 2026 Colegio Bernardo O&apos;Higgins
           </p>

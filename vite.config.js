@@ -8,12 +8,16 @@ export default defineConfig({
     react(),
     babel({ presets: [reactCompilerPreset()] })
   ],
+
+  // IMPORTANTE PARA GITHUB PAGES
+  base: '/libroclases-frontend/',
+
   server: {
     proxy: {
       '/api': {
-        target: 'http://localhost:8081',
+        target: 'https://nonposthumous-katabolically-constance.ngrok-free.dev',
         changeOrigin: true,
-        rewrite: (path) => path.replace(/^\/api/, ''),
+        secure: true,
       },
     },
   },
