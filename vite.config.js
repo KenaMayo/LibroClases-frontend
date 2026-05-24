@@ -4,13 +4,14 @@ import babel from '@rolldown/plugin-babel'
 
 // https://vite.dev/config/
 export default defineConfig({
+
+  // IMPORTANTE PARA GITHUB PAGES
+  base: '/LibroClases-frontend/',
+
   plugins: [
     react(),
     babel({ presets: [reactCompilerPreset()] })
   ],
-
-  // IMPORTANTE PARA GITHUB PAGES
-  base: '/libroclases-frontend/',
 
   server: {
     proxy: {
