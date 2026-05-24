@@ -3,69 +3,35 @@ import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 
 const DEMO_CREDENTIALS = [
-  { role: 'Docente', email: 'profesor@colegio.cl' },
-  { role: 'Estudiante', email: 'estudiante@colegio.cl' },
+  { role: 'Docente',       email: 'profesor@colegio.cl' },
+  { role: 'Estudiante',    email: 'estudiante@colegio.cl' },
   { role: 'Administrador', email: 'admin@colegio.cl' },
-  { role: 'Apoderado', email: 'apoderado@colegio.cl' },
+  { role: 'Apoderado',     email: 'apoderado@colegio.cl' },
 ];
-
-const API_URL = import.meta.env.VITE_API_URL;
 
 export default function LoginPage() {
   const { login } = useAuth();
   const navigate = useNavigate();
 
-  const [email, setEmail] = useState('');
+  const [email, setEmail]       = useState('');
   const [password, setPassword] = useState('');
-  const [error, setError] = useState('');
-  const [loading, setLoading] = useState(false);
+  const [error, setError]       = useState('');
+  const [loading, setLoading]   = useState(false);
   const [showPass, setShowPass] = useState(false);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
-
     if (!email || !password) {
       setError('Por favor, completa todos los campos.');
       return;
     }
-
     setLoading(true);
-
-    try {
-      const response = await fetch(`${API_URL}/auth/login`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          email,
-          password,
-        }),
-      });
-
-      const data = await response.json();
-
-      if (response.ok) {
-
-        // guardar token si existe
-        if (data.token) {
-          localStorage.setItem('token', data.token);
-        }
-
-        // guardar usuario si existe
-        if (data.user) {
-          localStorage.setItem('user', JSON.stringify(data.user));
-        }
-
-        navigate('/dashboard');
-      } else {
-        setError(data.message || 'Credenciales incorrectas');
-      }
-    } catch (err) {
-      console.error(err);
-      setError('No se pudo conectar al servidor');
-    } finally {
+    const result = await login(email, password);
+    if (result.success) {
+      navigate('/dashboard');
+    } else {
+      setError(result.error);
       setLoading(false);
     }
   };
@@ -135,13 +101,11 @@ export default function LoginPage() {
               )}
 
               <form onSubmit={handleSubmit} noValidate>
-
                 {/* Email */}
                 <div className="mb-3">
                   <label htmlFor="login-email" className="form-label small fw-semibold mb-1">
                     Correo electrónico
                   </label>
-
                   <input
                     id="login-email"
                     type="email"
@@ -160,17 +124,10 @@ export default function LoginPage() {
                     <label htmlFor="login-password" className="form-label small fw-semibold mb-0">
                       Contraseña
                     </label>
-
-                    <a
-                      href="#"
-                      className="small text-decoration-none"
-                      style={{ color: '#005eb8', fontSize: '0.8rem' }}
-                      onClick={(e) => e.preventDefault()}
-                    >
+                    <a href="#" className="small text-decoration-none" style={{ color: '#005eb8', fontSize: '0.8rem' }} onClick={(e) => e.preventDefault()}>
                       ¿Olvidaste tu contraseña?
                     </a>
                   </div>
-
                   <div className="input-group">
                     <input
                       id="login-password"
@@ -181,7 +138,6 @@ export default function LoginPage() {
                       onChange={(e) => setPassword(e.target.value)}
                       autoComplete="current-password"
                     />
-
                     <button
                       type="button"
                       className="btn btn-outline-secondary border-start-0"
@@ -201,16 +157,7 @@ export default function LoginPage() {
                   disabled={loading}
                 >
                   {loading
-                    ? (
-                      <>
-                        <span
-                          className="spinner-border spinner-border-sm me-2"
-                          role="status"
-                          aria-hidden="true"
-                        ></span>
-                        Ingresando...
-                      </>
-                    )
+                    ? (<><span className="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>Ingresando...</>)
                     : 'Ingresar'}
                 </button>
               </form>
@@ -222,12 +169,8 @@ export default function LoginPage() {
             <div className="card-body p-3">
               <p className="small fw-semibold text-muted mb-2">
                 <i className="bi bi-info-circle me-1"></i>
-                Acceso de demostración{' '}
-                <span className="fw-normal">
-                  (contraseña: <code>1234</code>)
-                </span>
+                Acceso de demostración <span className="fw-normal">(contraseña: <code>1234</code>)</span>
               </p>
-
               <div className="row g-2">
                 {DEMO_CREDENTIALS.map((c) => (
                   <div className="col-6" key={c.role}>
@@ -247,19 +190,10 @@ export default function LoginPage() {
 
           {/* Footer links */}
           <div className="text-center mt-4" style={{ fontSize: '0.78rem' }}>
-            <a href="#" className="text-muted text-decoration-none me-3" onClick={(e) => e.preventDefault()}>
-              Términos de uso
-            </a>
-
-            <a href="#" className="text-muted text-decoration-none me-3" onClick={(e) => e.preventDefault()}>
-              Política de privacidad
-            </a>
-
-            <a href="#" className="text-muted text-decoration-none" onClick={(e) => e.preventDefault()}>
-              Contacto
-            </a>
+            <a href="#" className="text-muted text-decoration-none me-3" onClick={(e) => e.preventDefault()}>Términos de uso</a>
+            <a href="#" className="text-muted text-decoration-none me-3" onClick={(e) => e.preventDefault()}>Política de privacidad</a>
+            <a href="#" className="text-muted text-decoration-none" onClick={(e) => e.preventDefault()}>Contacto</a>
           </div>
-
           <p className="text-center text-muted mt-2 mb-0" style={{ fontSize: '0.75rem' }}>
             © 2026 Colegio Bernardo O&apos;Higgins
           </p>
