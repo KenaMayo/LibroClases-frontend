@@ -11,18 +11,18 @@ export default function CardCurso({ curso }) {
         onClick={() => navigate(`/app/admin/cursos/${curso.id}`)}
       >
         <div className="card-body">
-          <h5 className="fw-bold mb-2">{curso.nombre}</h5>
+          <h5 className="fw-bold mb-2">
+            {curso.nombre}
+          </h5>
 
           <p className="text-muted mb-3">
             {curso.descripcion || 'Sin descripción'}
           </p>
 
-          <div className="mb-2">
-            <strong>Profesor jefe:</strong>
-            <p className="mb-0">
-              {curso.profesor || 'Sin profesor asignado'}
-            </p>
-          </div>
+          <p className="mb-2">
+            <strong>Profesor jefe:</strong>{' '}
+            {curso.profesor || 'Sin profesor asignado'}
+          </p>
 
           <hr />
 
