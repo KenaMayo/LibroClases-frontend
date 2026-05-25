@@ -5,22 +5,26 @@ import { useAuth } from '../../context/AuthContext';
 const DEMO_CREDENTIALS = [
   { role: 'Docente', email: 'profesor@colegio.cl' },
   { role: 'Estudiante', email: 'estudiante@colegio.cl' },
-  { role: 'Administrador', email: 'admin@colegio.cl' },
+  { role: 'Administrador', email: 'admin@colegio.com' },
   { role: 'Apoderado', email: 'apoderado@colegio.cl' },
 ];
 
-// URL REAL DEL BACKEND
 const API_URL = import.meta.env.VITE_API_URL;
 
 export default function LoginPage() {
 
   const { login } = useAuth();
+
   const navigate = useNavigate();
 
   const [email, setEmail] = useState('');
+
   const [password, setPassword] = useState('');
+
   const [error, setError] = useState('');
+
   const [loading, setLoading] = useState(false);
+
   const [showPass, setShowPass] = useState(false);
 
   const handleSubmit = async (e) => {
@@ -30,7 +34,9 @@ export default function LoginPage() {
     setError('');
 
     if (!email || !password) {
+
       setError('Por favor, completa todos los campos.');
+
       return;
     }
 
@@ -38,7 +44,6 @@ export default function LoginPage() {
 
     try {
 
-      // URL CORRECTA HACIA NGROK
       const response = await fetch(`${API_URL}/auth/login`, {
 
         method: 'POST',
@@ -58,42 +63,56 @@ export default function LoginPage() {
       let data;
 
       try {
+
         data = JSON.parse(text);
+
       } catch {
+
         data = { message: text };
       }
 
       if (response.ok) {
 
-        // GUARDAR TOKEN
+        // TOKEN
         if (data.token) {
-          localStorage.setItem('token', data.token);
+
+          localStorage.setItem(
+            'token',
+            data.token
+          );
         }
 
-        // GUARDAR USER
+        // USER
         if (data.user) {
-          localStorage.setItem('user', JSON.stringify(data.user));
-        } else {
 
-          // FALLBACK
-          localStorage.setItem('user', JSON.stringify({
-            email,
-            rol: 'ADMIN'
-          }));
+          localStorage.setItem(
+            'user',
+            JSON.stringify(data.user)
+          );
         }
 
-        // CONTEXTO AUTH
+        // AUTH CONTEXT
         if (login) {
 
           try {
+
             await login(email, password);
+
           } catch (err) {
+
             console.log(err);
           }
         }
 
-        // REDIRECCION
-        navigate('/app/dashboard');
+        // REDIRECCION ADMIN
+        if (email === 'admin@colegio.com') {
+
+          navigate('/app/admin/panel');
+
+        } else {
+
+          navigate('/app/dashboard');
+        }
 
       } else {
 
@@ -108,7 +127,9 @@ export default function LoginPage() {
 
       console.error(err);
 
-      setError('No se pudo conectar con el servidor');
+      setError(
+        'No se pudo conectar con el servidor'
+      );
 
     } finally {
 
@@ -119,24 +140,42 @@ export default function LoginPage() {
   const fillDemo = (demoEmail) => {
 
     setEmail(demoEmail);
+
     setPassword('1234');
+
     setError('');
   };
 
   return (
-    <div style={{ minHeight: '100vh', backgroundColor: '#f0f4f8', display: 'flex', flexDirection: 'column' }}>
+    <div
+      style={{
+        minHeight: '100vh',
+        backgroundColor: '#f0f4f8',
+        display: 'flex',
+        flexDirection: 'column'
+      }}
+    >
 
-      {/* ── Top nav bar ── */}
+      {/* NAVBAR */}
       <nav
         className="d-flex align-items-center justify-content-between px-4 py-0"
-        style={{ backgroundColor: '#002855', height: 56, flexShrink: 0 }}
+        style={{
+          backgroundColor: '#002855',
+          height: 56,
+          flexShrink: 0
+        }}
       >
+
         <div className="d-flex align-items-center gap-2 text-white">
+
           <i className="bi bi-book-half fs-5"></i>
 
           <span
             className="fw-semibold"
-            style={{ fontSize: '0.9rem', letterSpacing: '0.02em' }}
+            style={{
+              fontSize: '0.9rem',
+              letterSpacing: '0.02em'
+            }}
           >
             Colegio Bernardo O&apos;Higgins
           </span>
@@ -149,6 +188,7 @@ export default function LoginPage() {
           onClick={(e) => e.preventDefault()}
         >
           <i className="bi bi-question-circle me-1"></i>
+
           Ayuda
         </a>
       </nav>
@@ -156,7 +196,12 @@ export default function LoginPage() {
       {/* MAIN */}
       <main className="flex-grow-1 d-flex align-items-center justify-content-center px-3 py-5">
 
-        <div style={{ width: '100%', maxWidth: 440 }}>
+        <div
+          style={{
+            width: '100%',
+            maxWidth: 440
+          }}
+        >
 
           {/* LOGO */}
           <div className="text-center mb-4">
@@ -169,6 +214,7 @@ export default function LoginPage() {
                 backgroundColor: '#002855'
               }}
             >
+
               <i
                 className="bi bi-mortarboard-fill text-white"
                 style={{ fontSize: '1.9rem' }}
@@ -190,7 +236,7 @@ export default function LoginPage() {
             </p>
           </div>
 
-          {/* CARD */}
+          {/* CARD LOGIN */}
           <div className="card border-0 shadow rounded-3">
 
             <div className="card-body p-4">
@@ -203,17 +249,23 @@ export default function LoginPage() {
               </h2>
 
               {error && (
+
                 <div
                   className="alert alert-danger d-flex align-items-center gap-2 py-2 px-3"
                   role="alert"
                   style={{ fontSize: '0.85rem' }}
                 >
+
                   <i className="bi bi-exclamation-circle-fill flex-shrink-0"></i>
+
                   {error}
                 </div>
               )}
 
-              <form onSubmit={handleSubmit} noValidate>
+              <form
+                onSubmit={handleSubmit}
+                noValidate
+              >
 
                 {/* EMAIL */}
                 <div className="mb-3">
@@ -231,7 +283,9 @@ export default function LoginPage() {
                     className="form-control"
                     placeholder="usuario@colegio.cl"
                     value={email}
-                    onChange={(e) => setEmail(e.target.value)}
+                    onChange={(e) =>
+                      setEmail(e.target.value)
+                    }
                     autoComplete="email"
                     autoFocus
                   />
@@ -256,7 +310,9 @@ export default function LoginPage() {
                         color: '#005eb8',
                         fontSize: '0.8rem'
                       }}
-                      onClick={(e) => e.preventDefault()}
+                      onClick={(e) =>
+                        e.preventDefault()
+                      }
                     >
                       ¿Olvidaste tu contraseña?
                     </a>
@@ -266,22 +322,34 @@ export default function LoginPage() {
 
                     <input
                       id="login-password"
-                      type={showPass ? 'text' : 'password'}
+                      type={
+                        showPass
+                          ? 'text'
+                          : 'password'
+                      }
                       className="form-control border-end-0"
                       placeholder="••••••••"
                       value={password}
-                      onChange={(e) => setPassword(e.target.value)}
+                      onChange={(e) =>
+                        setPassword(e.target.value)
+                      }
                       autoComplete="current-password"
                     />
 
                     <button
                       type="button"
                       className="btn btn-outline-secondary border-start-0"
-                      onClick={() => setShowPass((p) => !p)}
-                      aria-label="Mostrar u ocultar contraseña"
+                      onClick={() =>
+                        setShowPass((p) => !p)
+                      }
                     >
+
                       <i
-                        className={`bi ${showPass ? 'bi-eye-slash' : 'bi-eye'}`}
+                        className={`bi ${
+                          showPass
+                            ? 'bi-eye-slash'
+                            : 'bi-eye'
+                        }`}
                       ></i>
                     </button>
                   </div>
@@ -297,7 +365,9 @@ export default function LoginPage() {
                   }}
                   disabled={loading}
                 >
+
                   {loading ? (
+
                     <>
                       <span
                         className="spinner-border spinner-border-sm me-2"
@@ -307,7 +377,9 @@ export default function LoginPage() {
 
                       Ingresando...
                     </>
+
                   ) : (
+
                     'Ingresar'
                   )}
                 </button>
@@ -321,12 +393,14 @@ export default function LoginPage() {
             <div className="card-body p-3">
 
               <p className="small fw-semibold text-muted mb-2">
+
                 <i className="bi bi-info-circle me-1"></i>
 
                 Acceso de demostración
 
                 <span className="fw-normal">
-                  (contraseña: <code>1234</code>)
+                  (contraseña:
+                  <code>1234</code>)
                 </span>
               </p>
 
@@ -334,13 +408,20 @@ export default function LoginPage() {
 
                 {DEMO_CREDENTIALS.map((c) => (
 
-                  <div className="col-6" key={c.role}>
+                  <div
+                    className="col-6"
+                    key={c.role}
+                  >
 
                     <button
                       type="button"
                       className="btn btn-outline-secondary btn-sm w-100"
-                      style={{ fontSize: '0.8rem' }}
-                      onClick={() => fillDemo(c.email)}
+                      style={{
+                        fontSize: '0.8rem'
+                      }}
+                      onClick={() =>
+                        fillDemo(c.email)
+                      }
                     >
                       {c.role}
                     </button>
@@ -359,7 +440,9 @@ export default function LoginPage() {
             <a
               href="#"
               className="text-muted text-decoration-none me-3"
-              onClick={(e) => e.preventDefault()}
+              onClick={(e) =>
+                e.preventDefault()
+              }
             >
               Términos de uso
             </a>
@@ -367,7 +450,9 @@ export default function LoginPage() {
             <a
               href="#"
               className="text-muted text-decoration-none me-3"
-              onClick={(e) => e.preventDefault()}
+              onClick={(e) =>
+                e.preventDefault()
+              }
             >
               Política de privacidad
             </a>
@@ -375,7 +460,9 @@ export default function LoginPage() {
             <a
               href="#"
               className="text-muted text-decoration-none"
-              onClick={(e) => e.preventDefault()}
+              onClick={(e) =>
+                e.preventDefault()
+              }
             >
               Contacto
             </a>
