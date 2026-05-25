@@ -8,28 +8,14 @@ const AuthContext = createContext(null);
 
 export function AuthProvider({ children }) {
 
-  const [user, setUser] = useState(() => {
+  const [user, setUser] = useState(null);
 
-    try {
+  const [token, setToken] = useState(null);
 
-      const saved =
-        sessionStorage.getItem('ldc_user');
-
-      return saved
-        ? JSON.parse(saved)
-        : null;
-
-    } catch {
-
-      return null;
-    }
-  });
-
-  const [token, setToken] = useState(() =>
-    sessionStorage.getItem('ldc_token') ?? null
-  );
-
-  const login = async (email, password) => {
+  const login = async (
+    email,
+    password
+  ) => {
 
     try {
 
@@ -56,14 +42,13 @@ export function AuthProvider({ children }) {
       if (!res.ok) {
 
         return {
-          success: false,
-          error: 'Correo o contraseña incorrectos.',
+          success:false,
+          error:'Credenciales incorrectas'
         };
       }
 
       const data = await res.json();
 
-      // TOKEN
       if (data.token) {
 
         sessionStorage.setItem(
@@ -74,17 +59,14 @@ export function AuthProvider({ children }) {
         setToken(data.token);
       }
 
-      // USER
       const profile = data.user || {
 
         email,
 
-        nombre: email,
-
         rol:
           email === 'admin@colegio.com'
             ? 'ADMIN'
-            : 'USUARIO',
+            : 'USUARIO'
       };
 
       sessionStorage.setItem(
@@ -95,16 +77,15 @@ export function AuthProvider({ children }) {
       setUser(profile);
 
       return {
-        success: true,
-        user: profile,
+        success:true,
+        user:profile
       };
 
     } catch {
 
       return {
-        success: false,
-        error:
-          'No se pudo conectar con el servidor.',
+        success:false,
+        error:'No se pudo conectar al servidor'
       };
     }
   };
@@ -115,9 +96,7 @@ export function AuthProvider({ children }) {
 
     setToken(null);
 
-    sessionStorage.removeItem('ldc_user');
-
-    sessionStorage.removeItem('ldc_token');
+    sessionStorage.clear();
   };
 
   return (
@@ -127,7 +106,7 @@ export function AuthProvider({ children }) {
         user,
         token,
         login,
-        logout,
+        logout
       }}
     >
       {children}
@@ -135,16 +114,7 @@ export function AuthProvider({ children }) {
   );
 }
 
-export function useAuth() {
+export function useAuth(){
 
-  const ctx = useContext(AuthContext);
-
-  if (!ctx) {
-
-    throw new Error(
-      'useAuth must be used within <AuthProvider>'
-    );
-  }
-
-  return ctx;
+  return useContext(AuthContext);
 }
