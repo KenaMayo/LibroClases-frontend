@@ -1,7 +1,8 @@
 import {
   createContext,
   useContext,
-  useState
+  useState,
+  useEffect
 } from 'react';
 
 const AuthContext = createContext(null);
@@ -11,6 +12,25 @@ export function AuthProvider({ children }) {
   const [user, setUser] = useState(null);
 
   const [token, setToken] = useState(null);
+
+  // CARGAR SESIÓN
+  useEffect(() => {
+
+    const storedUser =
+      sessionStorage.getItem('ldc_user');
+
+    const storedToken =
+      sessionStorage.getItem('ldc_token');
+
+    if (storedUser) {
+      setUser(JSON.parse(storedUser));
+    }
+
+    if (storedToken) {
+      setToken(storedToken);
+    }
+
+  }, []);
 
   const login = async (
     email,
@@ -22,10 +42,11 @@ export function AuthProvider({ children }) {
       const API_URL =
         import.meta.env.VITE_API_URL;
 
+      console.log('API URL:', API_URL);
+
       const res = await fetch(
         `${API_URL}/auth/login`,
         {
-
           method: 'POST',
 
           headers: {
@@ -39,27 +60,31 @@ export function AuthProvider({ children }) {
         }
       );
 
+      console.log('RESPONSE:', res);
+
       if (!res.ok) {
 
         return {
-          success:false,
-          error:'Credenciales incorrectas'
+          success: false,
+          error: 'Credenciales incorrectas'
         };
       }
 
-      const data = await res.json();
+      // TOKEN JWT
+      const token = await res.text();
 
-      if (data.token) {
+      console.log('TOKEN:', token);
 
-        sessionStorage.setItem(
-          'ldc_token',
-          data.token
-        );
+      // GUARDAR TOKEN
+      sessionStorage.setItem(
+        'ldc_token',
+        token
+      );
 
-        setToken(data.token);
-      }
+      setToken(token);
 
-      const profile = data.user || {
+      // PERFIL
+      const profile = {
 
         email,
 
@@ -69,6 +94,7 @@ export function AuthProvider({ children }) {
             : 'USUARIO'
       };
 
+      // GUARDAR USUARIO
       sessionStorage.setItem(
         'ldc_user',
         JSON.stringify(profile)
@@ -77,15 +103,20 @@ export function AuthProvider({ children }) {
       setUser(profile);
 
       return {
-        success:true,
-        user:profile
+        success: true,
+        user: profile
       };
 
-    } catch {
+    } catch (error) {
+
+      console.error(
+        'ERROR LOGIN:',
+        error
+      );
 
       return {
-        success:false,
-        error:'No se pudo conectar al servidor'
+        success: false,
+        error: 'No se pudo conectar al servidor'
       };
     }
   };
@@ -114,7 +145,7 @@ export function AuthProvider({ children }) {
   );
 }
 
-export function useAuth(){
+export function useAuth() {
 
   return useContext(AuthContext);
 }

@@ -70,7 +70,7 @@ export default function LoginPage() {
 
       } else {
 
-        navigate('/app/dashboard');
+        navigate('/app/admin/panel');
       }
 
     } catch (err) {

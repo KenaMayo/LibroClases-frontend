@@ -6,7 +6,10 @@ export default function RutaProtegida({ children }) {
 
   const { user } = useAuth();
 
-  return user
+  const storedUser =
+    sessionStorage.getItem('ldc_user');
+
+  return user || storedUser
     ? children
     : <Navigate to="/" replace />;
 }
