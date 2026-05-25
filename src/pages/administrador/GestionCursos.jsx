@@ -1,42 +1,30 @@
 import { useEffect, useState } from 'react';
 
-import CardGrupoUsuarios from '../../components/cursos/CardGrupoUsuarios';
+import CardCurso from '../../components/cursos/CardCurso';
 
-import { obtenerUsuarios } from '../../services/servicioUsuarios';
+import { obtenerCursos } from '../../services/servicioCursos';
 
 export default function GestionCursos() {
 
-  const [profesores, setProfesores] = useState([]);
-
-  const [alumnos, setAlumnos] = useState([]);
+  const [cursos, setCursos] = useState([]);
 
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    cargarUsuarios();
+    cargarCursos();
   }, []);
 
-  async function cargarUsuarios() {
+  async function cargarCursos() {
 
     try {
 
-      const usuarios = await obtenerUsuarios();
+      const data = await obtenerCursos();
 
-      setProfesores(
-        usuarios.filter(
-          (usuario) => usuario.rol === 'PROFESOR'
-        )
-      );
-
-      setAlumnos(
-        usuarios.filter(
-          (usuario) => usuario.rol === 'ALUMNO'
-        )
-      );
+      setCursos(data);
 
     } catch (error) {
 
-      console.error('Error cargando usuarios:', error);
+      console.error('Error cargando cursos:', error);
 
     } finally {
 
@@ -61,28 +49,21 @@ export default function GestionCursos() {
         </h2>
 
         <p className="text-muted">
-          Selecciona el grupo que deseas administrar.
+          Revisa información general, rendimiento y alumnos por curso.
         </p>
 
       </div>
 
       <div className="row g-4">
 
-        <CardGrupoUsuarios
-          titulo="Profesores"
-          descripcion="Administrar profesores del establecimiento"
-          cantidad={profesores.length}
-          ruta="/app/admin/cursos/profesores"
-          color="primary"
-        />
+        {cursos.map((curso) => (
 
-        <CardGrupoUsuarios
-          titulo="Alumnos"
-          descripcion="Administrar alumnos del establecimiento"
-          cantidad={alumnos.length}
-          ruta="/app/admin/cursos/alumnos"
-          color="success"
-        />
+          <CardCurso
+            key={curso.id}
+            curso={curso}
+          />
+
+        ))}
 
       </div>
 
