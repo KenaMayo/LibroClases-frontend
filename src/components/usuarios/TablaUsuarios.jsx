@@ -1,52 +1,71 @@
-export default function TablaUsuarios({ usuarios }) {
+export default function TablaUsuarios({
+
+  usuarios,
+  onEditar,
+  onEliminar
+
+}) {
 
   return (
-    <div className="table-responsive">
 
-      <table className="table align-middle">
+    <table className="table">
 
-        <thead>
-          <tr>
-            <th>ID</th>
-            <th>Nombre</th>
-            <th>Email</th>
-            <th>Rol</th>
-            <th>Acciones</th>
+      <thead>
+
+        <tr>
+
+          <th>ID</th>
+          <th>Nombre</th>
+          <th>Email</th>
+          <th>Rol</th>
+          <th>Acciones</th>
+
+        </tr>
+
+      </thead>
+
+      <tbody>
+
+        {usuarios.map((u) => (
+
+          <tr key={u.id}>
+
+            <td>{u.id}</td>
+
+            <td>{u.nombre}</td>
+
+            <td>{u.email}</td>
+
+            <td>{u.rol}</td>
+
+            <td>
+
+              <button
+                className="btn btn-warning btn-sm me-2"
+                onClick={() =>
+                  onEditar(u)
+                }
+              >
+                Editar
+              </button>
+
+              <button
+                className="btn btn-danger btn-sm"
+                onClick={() =>
+                  onEliminar(u)
+                }
+              >
+                Eliminar
+              </button>
+
+            </td>
+
           </tr>
-        </thead>
 
-        <tbody>
+        ))}
 
-          {usuarios.map((usuario) => (
+      </tbody>
 
-            <tr key={usuario.id}>
-
-              <td>{usuario.id}</td>
-
-              <td>{usuario.nombre}</td>
-
-              <td>{usuario.email}</td>
-
-              <td>
-                <span className="badge bg-primary">
-                  {usuario.rol}
-                </span>
-              </td>
-
-              <td>
-
-                <button className="btn btn-warning btn-sm me-2">
-                  Editar
-                </button>
-
-                <button className="btn btn-danger btn-sm">
-                  Eliminar
-                </button>
-              </td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
-    </div>
+    </table>
   );
 }
