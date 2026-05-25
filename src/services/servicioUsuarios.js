@@ -1,14 +1,42 @@
 const API =
   import.meta.env.VITE_API_URL;
 
+// HEADERS NGROK
+const headers = {
+
+  'Content-Type':
+    'application/json',
+
+  'ngrok-skip-browser-warning':
+    'true'
+};
+
+// =========================
+// OBTENER USUARIOS
+// =========================
+
 export async function obtenerUsuarios() {
 
   const res = await fetch(
-    `${API}/usuarios`
+    `${API}/usuarios`,
+    {
+      headers
+    }
   );
+
+  if (!res.ok) {
+
+    throw new Error(
+      'Error al obtener usuarios'
+    );
+  }
 
   return await res.json();
 }
+
+// =========================
+// CREAR USUARIO
+// =========================
 
 export async function crearUsuario(
   usuario
@@ -19,10 +47,7 @@ export async function crearUsuario(
     {
       method: 'POST',
 
-      headers: {
-        'Content-Type':
-          'application/json',
-      },
+      headers,
 
       body: JSON.stringify(
         usuario
@@ -30,8 +55,19 @@ export async function crearUsuario(
     }
   );
 
+  if (!res.ok) {
+
+    throw new Error(
+      'Error al crear usuario'
+    );
+  }
+
   return await res.json();
 }
+
+// =========================
+// ACTUALIZAR USUARIO
+// =========================
 
 export async function actualizarUsuario(
   id,
@@ -43,10 +79,7 @@ export async function actualizarUsuario(
     {
       method: 'PUT',
 
-      headers: {
-        'Content-Type':
-          'application/json',
-      },
+      headers,
 
       body: JSON.stringify(
         usuario
@@ -54,8 +87,19 @@ export async function actualizarUsuario(
     }
   );
 
+  if (!res.ok) {
+
+    throw new Error(
+      'Error al actualizar usuario'
+    );
+  }
+
   return await res.json();
 }
+
+// =========================
+// ELIMINAR USUARIO
+// =========================
 
 export async function eliminarUsuario(
   id
@@ -65,8 +109,17 @@ export async function eliminarUsuario(
     `${API}/usuarios/${id}`,
     {
       method: 'DELETE',
+
+      headers
     }
   );
+
+  if (!res.ok) {
+
+    throw new Error(
+      'Error al eliminar usuario'
+    );
+  }
 
   return await res.text();
 }

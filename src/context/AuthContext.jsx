@@ -13,7 +13,10 @@ export function AuthProvider({ children }) {
 
   const [token, setToken] = useState(null);
 
+  // =========================
   // CARGAR SESIÓN
+  // =========================
+
   useEffect(() => {
 
     const storedUser =
@@ -23,14 +26,22 @@ export function AuthProvider({ children }) {
       sessionStorage.getItem('ldc_token');
 
     if (storedUser) {
-      setUser(JSON.parse(storedUser));
+
+      setUser(
+        JSON.parse(storedUser)
+      );
     }
 
     if (storedToken) {
+
       setToken(storedToken);
     }
 
   }, []);
+
+  // =========================
+  // LOGIN
+  // =========================
 
   const login = async (
     email,
@@ -42,7 +53,10 @@ export function AuthProvider({ children }) {
       const API_URL =
         import.meta.env.VITE_API_URL;
 
-      console.log('API URL:', API_URL);
+      console.log(
+        'API URL:',
+        API_URL
+      );
 
       const res = await fetch(
         `${API_URL}/auth/login`,
@@ -50,7 +64,13 @@ export function AuthProvider({ children }) {
           method: 'POST',
 
           headers: {
-            'Content-Type': 'application/json',
+
+            'Content-Type':
+              'application/json',
+
+            // IMPORTANTE NGROK
+            'ngrok-skip-browser-warning':
+              'true'
           },
 
           body: JSON.stringify({
@@ -60,22 +80,36 @@ export function AuthProvider({ children }) {
         }
       );
 
-      console.log('RESPONSE:', res);
+      console.log(
+        'RESPONSE:',
+        res
+      );
 
       if (!res.ok) {
 
         return {
           success: false,
-          error: 'Credenciales incorrectas'
+          error:
+            'Credenciales incorrectas'
         };
       }
 
+      // =========================
       // TOKEN JWT
-      const token = await res.text();
+      // =========================
 
-      console.log('TOKEN:', token);
+      const token =
+        await res.text();
 
+      console.log(
+        'TOKEN:',
+        token
+      );
+
+      // =========================
       // GUARDAR TOKEN
+      // =========================
+
       sessionStorage.setItem(
         'ldc_token',
         token
@@ -83,18 +117,25 @@ export function AuthProvider({ children }) {
 
       setToken(token);
 
+      // =========================
       // PERFIL
+      // =========================
+
       const profile = {
 
         email,
 
         rol:
-          email === 'admin@colegio.com'
+          email ===
+          'admin@colegio.com'
             ? 'ADMIN'
             : 'USUARIO'
       };
 
+      // =========================
       // GUARDAR USUARIO
+      // =========================
+
       sessionStorage.setItem(
         'ldc_user',
         JSON.stringify(profile)
@@ -116,10 +157,15 @@ export function AuthProvider({ children }) {
 
       return {
         success: false,
-        error: 'No se pudo conectar al servidor'
+        error:
+          'No se pudo conectar al servidor'
       };
     }
   };
+
+  // =========================
+  // LOGOUT
+  // =========================
 
   const logout = () => {
 
@@ -145,7 +191,13 @@ export function AuthProvider({ children }) {
   );
 }
 
+// =========================
+// HOOK
+// =========================
+
 export function useAuth() {
 
-  return useContext(AuthContext);
+  return useContext(
+    AuthContext
+  );
 }
