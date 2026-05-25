@@ -1,7 +1,6 @@
 import { NavLink } from 'react-router-dom';
 
 export default function BarraLateralAdmin() {
-
   const menu = [
     {
       nombre: 'Panel Principal',
@@ -33,20 +32,20 @@ export default function BarraLateralAdmin() {
         minHeight: '100vh'
       }}
     >
-
       <h3 className="fw-bold mb-4">
         LibroClases
       </h3>
 
       <ul className="nav flex-column gap-2">
-
-        {menu.map((item, index) => (
-
-          <li key={index}>
-
+        {menu.map((item) => (
+          <li key={item.ruta}>
             <NavLink
               to={item.ruta}
-              className="nav-link text-white"
+              className={({ isActive }) =>
+                isActive
+                  ? 'nav-link text-white bg-primary rounded'
+                  : 'nav-link text-white'
+              }
             >
               {item.nombre}
             </NavLink>
