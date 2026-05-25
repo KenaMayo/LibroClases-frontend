@@ -1,18 +1,10 @@
-import { createContext, useContext, useState } from 'react';
-
+import {
+  createContext,
+  useContext,
+  useState
+} from 'react';
 
 const AuthContext = createContext(null);
-
-// URL REAL DEL BACKEND
-const API_URL = import.meta.env.VITE_API_URL;
-
-function decodeJwtPayload(token) {
-  try {
-    return JSON.parse(atob(token.split('.')[1]));
-  } catch {
-    return null;
-  }
-}
 
 export function AuthProvider({ children }) {
 
@@ -20,9 +12,12 @@ export function AuthProvider({ children }) {
 
     try {
 
-      const saved = sessionStorage.getItem('ldc_user');
+      const saved =
+        sessionStorage.getItem('ldc_user');
 
-      return saved ? JSON.parse(saved) : null;
+      return saved
+        ? JSON.parse(saved)
+        : null;
 
     } catch {
 
@@ -30,28 +25,33 @@ export function AuthProvider({ children }) {
     }
   });
 
-  const [token, setToken] = useState(
-    () => sessionStorage.getItem('ldc_token') ?? null
+  const [token, setToken] = useState(() =>
+    sessionStorage.getItem('ldc_token') ?? null
   );
 
   const login = async (email, password) => {
 
     try {
 
-      // URL CORRECTA HACIA NGROK
-      const res = await fetch(`${API_URL}/auth/login`, {
+      const API_URL =
+        import.meta.env.VITE_API_URL;
 
-        method: 'POST',
+      const res = await fetch(
+        `${API_URL}/auth/login`,
+        {
 
-        headers: {
-          'Content-Type': 'application/json',
-        },
+          method: 'POST',
 
-        body: JSON.stringify({
-          email,
-          password,
-        }),
-      });
+          headers: {
+            'Content-Type': 'application/json',
+          },
+
+          body: JSON.stringify({
+            email,
+            password,
+          }),
+        }
+      );
 
       if (!res.ok) {
 
@@ -61,54 +61,36 @@ export function AuthProvider({ children }) {
         };
       }
 
-      // LEER RESPUESTA
-      const text = await res.text();
+      const data = await res.json();
 
-      let jwt = text;
+      // TOKEN
+      if (data.token) {
 
-      // SI EL BACKEND DEVUELVE JSON
-      try {
+        sessionStorage.setItem(
+          'ldc_token',
+          data.token
+        );
 
-        const parsed = JSON.parse(text);
-
-        jwt = parsed.token || text;
-
-      } catch {
-        // texto normal
+        setToken(data.token);
       }
 
-      const payload = decodeJwtPayload(jwt);
+      // USER
+      const profile = data.user || {
 
-      const authenticatedEmail =
-        payload?.sub ?? email;
+        email,
 
-      // PERFIL TEMPORAL
-      const found = USERS.find(
-        (u) => u.email === authenticatedEmail
-      );
+        nombre: email,
 
-      const profile = found
-
-        ? (({ password: _pw, ...safe }) => safe)(found)
-
-        : {
-            email: authenticatedEmail,
-            name: authenticatedEmail,
-            role: 'student',
-            initials: authenticatedEmail
-              .slice(0, 2)
-              .toUpperCase(),
-          };
-
-      // GUARDAR SESION
-      sessionStorage.setItem('ldc_token', jwt);
+        rol:
+          email === 'admin@colegio.com'
+            ? 'ADMIN'
+            : 'USUARIO',
+      };
 
       sessionStorage.setItem(
         'ldc_user',
         JSON.stringify(profile)
       );
-
-      setToken(jwt);
 
       setUser(profile);
 
@@ -117,13 +99,12 @@ export function AuthProvider({ children }) {
         user: profile,
       };
 
-    } catch (err) {
-
-      console.error(err);
+    } catch {
 
       return {
         success: false,
-        error: 'No se pudo conectar con el servidor.',
+        error:
+          'No se pudo conectar con el servidor.',
       };
     }
   };
@@ -140,6 +121,7 @@ export function AuthProvider({ children }) {
   };
 
   return (
+
     <AuthContext.Provider
       value={{
         user,
