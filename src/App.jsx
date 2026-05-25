@@ -18,6 +18,7 @@ import GestionCursos from './pages/administrador/GestionCursos';
 import GestionAsignaturas from './pages/administrador/GestionAsignaturas';
 import ListadoUsuariosCurso from './pages/administrador/ListadoUsuariosCurso';
 import Reportes from './pages/administrador/Reportes';
+import DetalleCurso from './pages/cursos/DetalleCurso';
 
 export default function App() {
   return (
@@ -55,6 +56,11 @@ export default function App() {
             <Route
               path="cursos"
               element={<GestionCursos />}
+            />
+
+            <Route
+              path="cursos/:id"
+              element={<DetalleCurso />}
             />
 
             <Route
