@@ -5,28 +5,16 @@ import {
   Navigate
 } from 'react-router-dom';
 
-import {
-  AuthProvider,
-  useAuth
-} from './context/AuthContext';
+import { AuthProvider } from './context/AuthContext';
 
-import MainLayout from './components/layout/MainLayout';
+import RutaProtegida from './routes/RutaProtegida';
+
+import LayoutAdministrador from './components/layout/LayoutAdministrador';
 
 import LoginPage from './pages/login/login';
-import Dashboard from './pages/dashboard/dashboard';
-import Academic from './pages/academic/academic';
-import Attendance from './pages/attendance/attendance';
-import Messages from './pages/messages/messages';
-import Reports from './pages/reports/reports';
 
-function ProtectedRoute({ children }) {
-
-  const { user } = useAuth();
-
-  return user
-    ? children
-    : <Navigate to="/" replace />;
-}
+import PanelAdministrador from './pages/administrador/PanelAdministrador';
+import GestionUsuarios from './pages/administrador/GestionUsuarios';
 
 export default function App() {
 
@@ -34,66 +22,36 @@ export default function App() {
 
     <AuthProvider>
 
-      {/* HASH ROUTER PARA GITHUB PAGES */}
       <HashRouter>
 
         <Routes>
 
-          {/* LOGIN PRINCIPAL */}
           <Route
             path="/"
             element={<LoginPage />}
           />
 
-          {/* RUTAS PROTEGIDAS */}
           <Route
-            path="/app"
+            path="/app/admin"
             element={
-              <ProtectedRoute>
-                <MainLayout />
-              </ProtectedRoute>
+              <RutaProtegida>
+                <LayoutAdministrador />
+              </RutaProtegida>
             }
           >
 
-            {/* REDIRECCION INTERNA */}
             <Route
-              index
-              element={
-                <Navigate
-                  to="/app/dashboard"
-                  replace
-                />
-              }
+              path="panel"
+              element={<PanelAdministrador />}
             />
 
             <Route
-              path="dashboard"
-              element={<Dashboard />}
-            />
-
-            <Route
-              path="academic"
-              element={<Academic />}
-            />
-
-            <Route
-              path="attendance"
-              element={<Attendance />}
-            />
-
-            <Route
-              path="messages"
-              element={<Messages />}
-            />
-
-            <Route
-              path="reports"
-              element={<Reports />}
+              path="usuarios"
+              element={<GestionUsuarios />}
             />
 
           </Route>
 
-          {/* FALLBACK */}
           <Route
             path="*"
             element={<Navigate to="/" replace />}
