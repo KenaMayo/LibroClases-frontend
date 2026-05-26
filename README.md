@@ -48,24 +48,6 @@ Instala las dependencias:
 npm install
 ```
 
-## Ejecución en desarrollo
-
-```bash
-npm run dev
-```
-
-## Construcción para producción
-
-```bash
-npm run build
-```
-
-## Vista previa de producción
-
-```bash
-npm run preview
-```
-
 ## Estructura esperada del proyecto
 
 Dentro de este frontend se pueden encontrar elementos como:
@@ -76,6 +58,50 @@ Dentro de este frontend se pueden encontrar elementos como:
 - Recursos estáticos
 - Configuración del entorno de desarrollo
 
+##  Estructura principal
+src/
+Carpeta principal del código fuente.
+
+components/
+Componentes reutilizables de la interfaz, como la barra de navegación (Navbar.jsx), el menú lateral (Sidebar.jsx) y el layout principal (MainLayout.jsx).
+context/
+Contextos de React para manejo de estado global, como la autenticación (AuthContext.jsx).
+mockdata/
+Datos simulados para pruebas y desarrollo.
+pages/
+Páginas principales de la aplicación, organizadas por funcionalidad:
+academic/: Página de gestión académica.
+attendance/: Página de registro y visualización de asistencias.
+dashboard/: Página principal con resumen e indicadores.
+login/: Página de inicio de sesión y sus componentes.
+messages/: Página de mensajería interna.
+reports/: Página de reportes académicos.
+services/
+Lógica para interactuar con la API del backend (api.js).
+App.jsx, main.jsx
+Archivos de entrada de la aplicación y configuración de rutas.
+index.css, App.css
+Archivos de estilos globales y específicos.
+public/
+Archivos estáticos y recursos públicos.
+
+package.json
+Configuración de dependencias y scripts de npm.
+
+vite.config.js
+Configuración de Vite para el desarrollo y build.
+
+README.md
+Documentación del frontend.
+
+## Características
+Framework: React 18+ con Vite para desarrollo rápido y eficiente.
+Componentización: Uso de componentes reutilizables para una interfaz consistente.
+Gestión de estado: Context API para autenticación y otros estados globales.
+Consumo de API: Comunicación con el backend para obtener y enviar datos académicos.
+Rutas protegidas: Acceso restringido a ciertas páginas según el estado de autenticación.
+Estilos modernos: CSS modularizado para mantener el código limpio y escalable.
+
 ## Propósito
 
 El objetivo de este proyecto es servir como la capa de presentación de **LibroClases**, permitiendo a los usuarios interactuar con el sistema de manera intuitiva y eficiente.
@@ -84,6 +110,4 @@ El objetivo de este proyecto es servir como la capa de presentación de **LibroC
 
 En desarrollo.
 
-## Autor
 
-Repositorio mantenido en GitHub por **KenaMayo**.
