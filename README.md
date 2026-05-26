@@ -58,41 +58,43 @@ Dentro de este frontend se pueden encontrar elementos como:
 - Recursos estáticos
 - Configuración del entorno de desarrollo
 
-##  Estructura principal
+
+# Estructura Principal
+
+```bash
 src/
-Carpeta principal del código fuente.
+├── components/         # Componentes reutilizables de la interfaz
+│   ├── Navbar.jsx
+│   ├── Sidebar.jsx
+│   └── MainLayout.jsx
+│
+├── context/            # Contextos de React para manejo de estado global
+│   └── AuthContext.jsx
+│
+├── mockdata/           # Datos simulados para pruebas y desarrollo
+│
+├── pages/              # Páginas principales de la aplicación
+│   ├── academic/       # Gestión académica
+│   ├── attendance/     # Registro y visualización de asistencias
+│   ├── dashboard/      # Dashboard principal con indicadores
+│   ├── login/          # Inicio de sesión
+│   ├── messages/       # Mensajería interna
+│   └── reports/        # Reportes académicos
+│
+├── services/           # Lógica de conexión con la API backend
+│   └── api.js
+│
+├── App.jsx             # Componente principal de la aplicación
+├── main.jsx            # Configuración inicial y rutas
+├── index.css           # Estilos globales
+└── App.css             # Estilos específicos
 
-components/
-Componentes reutilizables de la interfaz, como la barra de navegación (Navbar.jsx), el menú lateral (Sidebar.jsx) y el layout principal (MainLayout.jsx).
-context/
-Contextos de React para manejo de estado global, como la autenticación (AuthContext.jsx).
-mockdata/
-Datos simulados para pruebas y desarrollo.
-pages/
-Páginas principales de la aplicación, organizadas por funcionalidad:
-academic/: Página de gestión académica.
-attendance/: Página de registro y visualización de asistencias.
-dashboard/: Página principal con resumen e indicadores.
-login/: Página de inicio de sesión y sus componentes.
-messages/: Página de mensajería interna.
-reports/: Página de reportes académicos.
-services/
-Lógica para interactuar con la API del backend (api.js).
-App.jsx, main.jsx
-Archivos de entrada de la aplicación y configuración de rutas.
-index.css, App.css
-Archivos de estilos globales y específicos.
-public/
-Archivos estáticos y recursos públicos.
+public/                 # Recursos estáticos públicos
 
-package.json
-Configuración de dependencias y scripts de npm.
-
-vite.config.js
-Configuración de Vite para el desarrollo y build.
-
-README.md
-Documentación del frontend.
+package.json            # Dependencias y scripts de npm
+vite.config.js          # Configuración de Vite
+README.md               # Documentación del frontend
+```
 
 ## Características
 Framework: React 18+ con Vite para desarrollo rápido y eficiente.
