@@ -1,81 +1,225 @@
-import { createContext, useContext, useState } from 'react';
-import { USERS } from '../mockdata';
+import {
+  createContext,
+  useContext,
+  useState,
+  useEffect
+} from 'react';
 
 const AuthContext = createContext(null);
 
-function decodeJwtPayload(token) {
-  try {
-    return JSON.parse(atob(token.split('.')[1]));
-  } catch {
-    return null;
-  }
-}
-
 export function AuthProvider({ children }) {
-  const [user, setUser] = useState(() => {
-    try {
-      const saved = sessionStorage.getItem('ldc_user');
-      return saved ? JSON.parse(saved) : null;
-    } catch {
-      return null;
+
+  const [user, setUser] = useState(null);
+
+  const [token, setToken] = useState(null);
+
+  // =========================
+  // CARGAR SESIÓN
+  // =========================
+
+  useEffect(() => {
+
+    const storedUser =
+      sessionStorage.getItem('ldc_user');
+
+    const storedToken =
+      sessionStorage.getItem('ldc_token');
+
+    if (storedUser) {
+
+      setUser(
+        JSON.parse(storedUser)
+      );
     }
-  });
 
-  const [token, setToken] = useState(() => sessionStorage.getItem('ldc_token') ?? null);
+    if (storedToken) {
 
-  const login = async (email, password) => {
+      setToken(storedToken);
+    }
+
+  }, []);
+
+  // =========================
+  // LOGIN
+  // =========================
+
+  const login = async (
+    email,
+    password
+  ) => {
+
     try {
-      const res = await fetch('/api/auth/login', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email, password }),
-      });
+
+      const API_URL =
+        import.meta.env.VITE_API_URL;
+
+      console.log(
+        'API URL:',
+        API_URL
+      );
+
+      const res = await fetch(
+        `${API_URL}/auth/login`,
+        {
+          method: 'POST',
+
+          headers: {
+
+            'Content-Type':
+              'application/json',
+
+            // IMPORTANTE NGROK
+            'ngrok-skip-browser-warning':
+              'true'
+          },
+
+          body: JSON.stringify({
+            email,
+            password,
+          }),
+        }
+      );
+
+      console.log(
+        'RESPONSE:',
+        res
+      );
 
       if (!res.ok) {
-        return { success: false, error: 'Correo o contraseña incorrectos.' };
+
+        return {
+          success: false,
+          error:
+            'Credenciales incorrectas'
+        };
       }
 
-      const jwt = await res.text();
-      const payload = decodeJwtPayload(jwt);
-      const authenticatedEmail = payload?.sub ?? email;
+      // =========================
+      // TOKEN JWT
+      // =========================
 
-      // Enrich profile from mockdata until /auth/me is available in the backend
-      const found = USERS.find((u) => u.email === authenticatedEmail);
-      const profile = found
-        ? (({ password: _pw, ...safe }) => safe)(found)
-        : {
-            email: authenticatedEmail,
-            name: authenticatedEmail,
-            role: 'student',
-            initials: authenticatedEmail.slice(0, 2).toUpperCase(),
-          };
+      const token =
+        await res.text();
 
-      sessionStorage.setItem('ldc_token', jwt);
-      sessionStorage.setItem('ldc_user', JSON.stringify(profile));
-      setToken(jwt);
+      // =========================
+      // GUARDAR TOKEN
+      // =========================
+
+      sessionStorage.setItem(
+        'ldc_token',
+        token
+      );
+
+      setToken(token);
+
+      // =========================
+      // OBTENER PERFIL REAL
+      // =========================
+
+      let profile = { email, rol: 'USUARIO', nombre: email };
+
+      try {
+
+        const usuariosRes = await fetch(
+          `${API_URL}/usuarios`,
+          {
+            headers: {
+              'Content-Type': 'application/json',
+              'ngrok-skip-browser-warning': 'true'
+            }
+          }
+        );
+
+        if (usuariosRes.ok) {
+
+          const usuarios = await usuariosRes.json();
+
+          const found = usuarios.find(
+            (u) => u.email === email
+          );
+
+          if (found) {
+
+            profile = {
+              id: found.id,
+              nombre: found.nombre,
+              email: found.email,
+              rol: found.rol
+            };
+          }
+        }
+
+      } catch (profileError) {
+
+        console.warn('No se pudo obtener perfil:', profileError);
+      }
+
+      // =========================
+      // GUARDAR USUARIO
+      // =========================
+
+      sessionStorage.setItem(
+        'ldc_user',
+        JSON.stringify(profile)
+      );
+
       setUser(profile);
-      return { success: true, user: profile };
-    } catch {
-      return { success: false, error: 'No se pudo conectar con el servidor.' };
+
+      return {
+        success: true,
+        user: profile
+      };
+
+    } catch (error) {
+
+      console.error(
+        'ERROR LOGIN:',
+        error
+      );
+
+      return {
+        success: false,
+        error:
+          'No se pudo conectar al servidor'
+      };
     }
   };
 
+  // =========================
+  // LOGOUT
+  // =========================
+
   const logout = () => {
+
     setUser(null);
+
     setToken(null);
-    sessionStorage.removeItem('ldc_user');
-    sessionStorage.removeItem('ldc_token');
+
+    sessionStorage.clear();
   };
 
   return (
-    <AuthContext.Provider value={{ user, token, login, logout }}>
+
+    <AuthContext.Provider
+      value={{
+        user,
+        token,
+        login,
+        logout
+      }}
+    >
       {children}
     </AuthContext.Provider>
   );
 }
 
+// =========================
+// HOOK
+// =========================
+
 export function useAuth() {
-  const ctx = useContext(AuthContext);
-  if (!ctx) throw new Error('useAuth must be used within <AuthProvider>');
-  return ctx;
+
+  return useContext(
+    AuthContext
+  );
 }

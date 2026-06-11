@@ -4,16 +4,21 @@ import babel from '@rolldown/plugin-babel'
 
 // https://vite.dev/config/
 export default defineConfig({
+
+  // IMPORTANTE PARA GITHUB PAGES
+  base: '/LibroClases-frontend/',
+
   plugins: [
     react(),
     babel({ presets: [reactCompilerPreset()] })
   ],
+
   server: {
     proxy: {
       '/api': {
-        target: 'http://localhost:8081',
+        target: 'https://nonposthumous-katabolically-constance.ngrok-free.dev',
         changeOrigin: true,
-        rewrite: (path) => path.replace(/^\/api/, ''),
+        secure: true,
       },
     },
   },

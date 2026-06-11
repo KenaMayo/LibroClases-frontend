@@ -1,42 +1,128 @@
-import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
-import { AuthProvider, useAuth } from './context/AuthContext';
-import MainLayout   from './components/layout/MainLayout';
-import LoginPage    from './pages/login/login';
-import Dashboard    from './pages/dashboard/dashboard';
-import Academic     from './pages/academic/academic';
-import Attendance   from './pages/attendance/attendance';
-import Messages     from './pages/messages/messages';
-import Reports      from './pages/reports/reports';
+import {
+  HashRouter,
+  Routes,
+  Route,
+  Navigate
+} from 'react-router-dom';
 
-function ProtectedRoute({ children }) {
-  const { user } = useAuth();
-  return user ? children : <Navigate to="/login" replace />;
-}
+import { AuthProvider } from './context/AuthContext';
+
+import RutaProtegida from './routes/RutaProtegida';
+import LayoutAdministrador from './components/layout/LayoutAdministrador';
+import LayoutProfesor from './components/layout/LayoutProfesor';
+
+import LoginPage from './pages/login/login';
+
+import PanelAdministrador from './pages/administrador/PanelAdministrador';
+import GestionUsuarios from './pages/administrador/GestionUsuarios';
+import GestionCursos from './pages/administrador/GestionCursos';
+import GestionAsignaturas from './pages/administrador/GestionAsignaturas';
+import ListadoUsuariosCurso from './pages/administrador/ListadoUsuariosCurso';
+import Reportes from './pages/administrador/Reportes';
+import MensajesAdmin from './pages/administrador/Mensajes';
+import DetalleCurso from './pages/cursos/DetalleCurso';
+
+import PanelProfesor from './pages/teacher/PanelProfesor';
+import RegistroAsistencia from './pages/teacher/RegistroAsistencia';
+import RegistroNotas from './pages/teacher/RegistroNotas';
+import MensajesProfesor from './pages/teacher/MensajesProfesor';
 
 export default function App() {
   return (
     <AuthProvider>
-      <BrowserRouter>
+      <HashRouter>
         <Routes>
-          <Route path="/login" element={<LoginPage />} />
           <Route
             path="/"
+            element={<LoginPage />}
+          />
+
+          {/* RUTAS ADMINISTRADOR */}
+          <Route
+            path="/app/admin"
             element={
-              <ProtectedRoute>
-                <MainLayout />
-              </ProtectedRoute>
+              <RutaProtegida>
+                <LayoutAdministrador />
+              </RutaProtegida>
             }
           >
-            <Route index element={<Navigate to="/dashboard" replace />} />
-            <Route path="dashboard"  element={<Dashboard  />} />
-            <Route path="academic"   element={<Academic   />} />
-            <Route path="attendance" element={<Attendance />} />
-            <Route path="messages"   element={<Messages   />} />
-            <Route path="reports"    element={<Reports    />} />
+            <Route
+              path="panel"
+              element={<PanelAdministrador />}
+            />
+
+            <Route
+              path="usuarios"
+              element={<GestionUsuarios />}
+            />
+
+            <Route
+              path="usuarios/:tipo"
+              element={<ListadoUsuariosCurso />}
+            />
+
+            <Route
+              path="cursos"
+              element={<GestionCursos />}
+            />
+
+            <Route
+              path="cursos/:id"
+              element={<DetalleCurso />}
+            />
+
+            <Route
+              path="asignaturas"
+              element={<GestionAsignaturas />}
+            />
+
+            <Route
+              path="reportes"
+              element={<Reportes />}
+            />
+
+            <Route
+              path="mensajes"
+              element={<MensajesAdmin />}
+            />
           </Route>
-          <Route path="*" element={<Navigate to="/login" replace />} />
+
+          {/* RUTAS PROFESOR */}
+          <Route
+            path="/app/profesor"
+            element={
+              <RutaProtegida>
+                <LayoutProfesor />
+              </RutaProtegida>
+            }
+          >
+            <Route
+              path="panel"
+              element={<PanelProfesor />}
+            />
+
+            <Route
+              path="asistencia"
+              element={<RegistroAsistencia />}
+            />
+
+            <Route
+              path="notas"
+              element={<RegistroNotas />}
+            />
+
+            <Route
+              path="mensajes"
+              element={<MensajesProfesor />}
+            />
+          </Route>
+
+          <Route
+            path="*"
+            element={<Navigate to="/" replace />}
+          />
         </Routes>
-      </BrowserRouter>
+      </HashRouter>
     </AuthProvider>
   );
 }

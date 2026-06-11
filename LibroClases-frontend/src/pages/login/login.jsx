@@ -1,202 +1,301 @@
+import './login.css';
+
 import { useState } from 'react';
+
 import { useNavigate } from 'react-router-dom';
+
 import { useAuth } from '../../context/AuthContext';
 
 const DEMO_CREDENTIALS = [
-  { role: 'Docente',       email: 'profesor@colegio.cl' },
-  { role: 'Estudiante',    email: 'estudiante@colegio.cl' },
-  { role: 'Administrador', email: 'admin@colegio.cl' },
-  { role: 'Apoderado',     email: 'apoderado@colegio.cl' },
+  {
+    role: 'Docente',
+    email: 'profesor@colegio.cl'
+  },
+  {
+    role: 'Estudiante',
+    email: 'estudiante@colegio.cl'
+  },
+  {
+    role: 'Administrador',
+    email: 'admin@colegio.com'
+  },
+  {
+    role: 'Apoderado',
+    email: 'apoderado@colegio.cl'
+  },
 ];
 
 export default function LoginPage() {
-  const { login } = useAuth();
+
   const navigate = useNavigate();
 
-  const [email, setEmail]       = useState('');
+  const { login } = useAuth();
+
+  const [email, setEmail] = useState('');
+
   const [password, setPassword] = useState('');
-  const [error, setError]       = useState('');
-  const [loading, setLoading]   = useState(false);
+
+  const [error, setError] = useState('');
+
+  const [loading, setLoading] = useState(false);
+
   const [showPass, setShowPass] = useState(false);
 
   const handleSubmit = async (e) => {
+
     e.preventDefault();
+
     setError('');
-    if (!email || !password) {
-      setError('Por favor, completa todos los campos.');
-      return;
-    }
+
     setLoading(true);
-    const result = await login(email, password);
-    if (result.success) {
-      navigate('/dashboard');
-    } else {
-      setError(result.error);
+
+    try {
+
+      const result = await login(
+        email,
+        password
+      );
+
+      if (!result.success) {
+
+        setError(result.error);
+
+        return;
+      }
+
+      // ADMIN
+      if (result.user?.rol === 'ADMIN') {
+
+        navigate('/app/admin/panel');
+
+      } else if (result.user?.rol === 'PROFESOR') {
+
+        navigate('/app/profesor/panel');
+
+      } else {
+
+        navigate('/app/admin/panel');
+      }
+
+    } catch (err) {
+
+      console.error(err);
+
+      setError(
+        'Error al iniciar sesión'
+      );
+
+    } finally {
+
       setLoading(false);
     }
   };
 
   const fillDemo = (demoEmail) => {
+
     setEmail(demoEmail);
+
     setPassword('1234');
-    setError('');
   };
 
   return (
-    <div style={{ minHeight: '100vh', backgroundColor: '#f0f4f8', display: 'flex', flexDirection: 'column' }}>
 
-      {/* ── Top nav bar (Cambridge-style) ── */}
-      <nav
-        className="d-flex align-items-center justify-content-between px-4 py-0"
-        style={{ backgroundColor: '#002855', height: 56, flexShrink: 0 }}
-      >
-        <div className="d-flex align-items-center gap-2 text-white">
-          <i className="bi bi-book-half fs-5"></i>
-          <span className="fw-semibold" style={{ fontSize: '0.9rem', letterSpacing: '0.02em' }}>
-            Colegio Bernardo O&apos;Higgins
+    <div className="login-page">
+
+      {/* NAVBAR */}
+      <nav className="login-navbar">
+
+        <div className="login-navbar-left">
+
+          <i className="bi bi-book-half"></i>
+
+          <span>
+            Colegio Bernardo O'Higgins
           </span>
         </div>
-        <a
-          href="#"
-          className="text-white-50 text-decoration-none small"
-          style={{ fontSize: '0.8rem' }}
-          onClick={(e) => e.preventDefault()}
-        >
-          <i className="bi bi-question-circle me-1"></i>Ayuda
+
+        <a href="#">
+          <i className="bi bi-question-circle"></i>
+
+          Ayuda
         </a>
       </nav>
 
-      {/* ── Main content ── */}
-      <main className="flex-grow-1 d-flex align-items-center justify-content-center px-3 py-5">
-        <div style={{ width: '100%', maxWidth: 440 }}>
+      {/* CONTENIDO */}
+      <main className="login-main">
 
-          {/* School emblem */}
-          <div className="text-center mb-4">
-            <div
-              className="d-inline-flex align-items-center justify-content-center rounded-circle mb-3"
-              style={{ width: 72, height: 72, backgroundColor: '#002855' }}
-            >
-              <i className="bi bi-mortarboard-fill text-white" style={{ fontSize: '1.9rem' }}></i>
+        <div className="login-container">
+
+          {/* LOGO */}
+          <div className="login-logo">
+
+            <div className="login-logo-circle">
+
+              <i className="bi bi-mortarboard-fill"></i>
             </div>
-            <h1 className="h5 fw-bold mb-1" style={{ color: '#002855' }}>
+
+            <h1>
               Libro de Clases Digital
             </h1>
-            <p className="text-muted mb-0" style={{ fontSize: '0.83rem' }}>
+
+            <p>
               Sistema de Gestión Académica
             </p>
           </div>
 
-          {/* Login card */}
-          <div className="card border-0 shadow rounded-3">
-            <div className="card-body p-4">
-              <h2 className="h6 fw-semibold mb-4" style={{ color: '#002855' }}>
+          {/* CARD LOGIN */}
+          <div className="login-card">
+
+            <div className="login-card-body">
+
+              <h2>
                 Iniciar sesión
               </h2>
 
               {error && (
-                <div className="alert alert-danger d-flex align-items-center gap-2 py-2 px-3" role="alert" style={{ fontSize: '0.85rem' }}>
-                  <i className="bi bi-exclamation-circle-fill flex-shrink-0"></i>
-                  {error}
+
+                <div className="login-error">
+
+                  <i className="bi bi-exclamation-circle-fill"></i>
+
+                  <span>{error}</span>
                 </div>
               )}
 
-              <form onSubmit={handleSubmit} noValidate>
-                {/* Email */}
-                <div className="mb-3">
-                  <label htmlFor="login-email" className="form-label small fw-semibold mb-1">
+              <form onSubmit={handleSubmit}>
+
+                {/* EMAIL */}
+                <div className="login-group">
+
+                  <label>
                     Correo electrónico
                   </label>
+
                   <input
-                    id="login-email"
                     type="email"
-                    className="form-control"
                     placeholder="usuario@colegio.cl"
                     value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    autoComplete="email"
-                    autoFocus
+                    onChange={(e) =>
+                      setEmail(e.target.value)
+                    }
                   />
                 </div>
 
-                {/* Password */}
-                <div className="mb-4">
-                  <div className="d-flex justify-content-between align-items-center mb-1">
-                    <label htmlFor="login-password" className="form-label small fw-semibold mb-0">
+                {/* PASSWORD */}
+                <div className="login-group">
+
+                  <div className="login-password-header">
+
+                    <label>
                       Contraseña
                     </label>
-                    <a href="#" className="small text-decoration-none" style={{ color: '#005eb8', fontSize: '0.8rem' }} onClick={(e) => e.preventDefault()}>
+
+                    <a href="#">
                       ¿Olvidaste tu contraseña?
                     </a>
                   </div>
-                  <div className="input-group">
+
+                  <div className="login-password-box">
+
                     <input
-                      id="login-password"
-                      type={showPass ? 'text' : 'password'}
-                      className="form-control border-end-0"
+                      type={
+                        showPass
+                          ? 'text'
+                          : 'password'
+                      }
                       placeholder="••••••••"
                       value={password}
-                      onChange={(e) => setPassword(e.target.value)}
-                      autoComplete="current-password"
+                      onChange={(e) =>
+                        setPassword(e.target.value)
+                      }
                     />
+
                     <button
                       type="button"
-                      className="btn btn-outline-secondary border-start-0"
-                      onClick={() => setShowPass((p) => !p)}
-                      aria-label="Mostrar u ocultar contraseña"
+                      onClick={() =>
+                        setShowPass(!showPass)
+                      }
                     >
-                      <i className={`bi ${showPass ? 'bi-eye-slash' : 'bi-eye'}`}></i>
+
+                      <i
+                        className={`bi ${
+                          showPass
+                            ? 'bi-eye-slash'
+                            : 'bi-eye'
+                        }`}
+                      ></i>
                     </button>
                   </div>
                 </div>
 
-                {/* Submit */}
+                {/* BOTON */}
                 <button
                   type="submit"
-                  className="btn w-100 text-white fw-semibold"
-                  style={{ backgroundColor: '#002855', borderColor: '#002855' }}
+                  className="login-button"
                   disabled={loading}
                 >
+
                   {loading
-                    ? (<><span className="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>Ingresando...</>)
+                    ? 'Ingresando...'
                     : 'Ingresar'}
                 </button>
               </form>
             </div>
           </div>
 
-          {/* Demo credentials */}
-          <div className="card border-0 bg-light mt-3">
-            <div className="card-body p-3">
-              <p className="small fw-semibold text-muted mb-2">
-                <i className="bi bi-info-circle me-1"></i>
-                Acceso de demostración <span className="fw-normal">(contraseña: <code>1234</code>)</span>
+          {/* DEMO */}
+          <div className="demo-card">
+
+            <div className="demo-card-body">
+
+              <p>
+
+                <i className="bi bi-info-circle"></i>
+
+                Acceso de demostración
+
+                <span>(contraseña: 1234)</span>
               </p>
-              <div className="row g-2">
+
+              <div className="demo-grid">
+
                 {DEMO_CREDENTIALS.map((c) => (
-                  <div className="col-6" key={c.role}>
-                    <button
-                      type="button"
-                      className="btn btn-outline-secondary btn-sm w-100"
-                      style={{ fontSize: '0.8rem' }}
-                      onClick={() => fillDemo(c.email)}
-                    >
-                      {c.role}
-                    </button>
-                  </div>
+
+                  <button
+                    key={c.role}
+                    onClick={() =>
+                      fillDemo(c.email)
+                    }
+                  >
+                    {c.role}
+                  </button>
                 ))}
               </div>
             </div>
           </div>
 
-          {/* Footer links */}
-          <div className="text-center mt-4" style={{ fontSize: '0.78rem' }}>
-            <a href="#" className="text-muted text-decoration-none me-3" onClick={(e) => e.preventDefault()}>Términos de uso</a>
-            <a href="#" className="text-muted text-decoration-none me-3" onClick={(e) => e.preventDefault()}>Política de privacidad</a>
-            <a href="#" className="text-muted text-decoration-none" onClick={(e) => e.preventDefault()}>Contacto</a>
+          {/* FOOTER */}
+          <div className="login-footer">
+
+            <div className="login-footer-links">
+
+              <a href="#">
+                Términos de uso
+              </a>
+
+              <a href="#">
+                Política de privacidad
+              </a>
+
+              <a href="#">
+                Contacto
+              </a>
+            </div>
+
+            <p>
+              © 2026 Colegio Bernardo O'Higgins
+            </p>
           </div>
-          <p className="text-center text-muted mt-2 mb-0" style={{ fontSize: '0.75rem' }}>
-            © 2026 Colegio Bernardo O&apos;Higgins
-          </p>
         </div>
       </main>
     </div>
