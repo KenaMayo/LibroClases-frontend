@@ -37,6 +37,7 @@ export default function App() {
             element={<LoginPage />}
           />
 
+          {/* RUTAS ADMIN */}
           <Route
             path="/app/admin"
             element={
@@ -80,6 +81,23 @@ export default function App() {
             <Route
               path="reportes"
               element={<Reportes />}
+            />
+          </Route>
+
+          {/* RUTAS PROFESOR/DOCENTE */}
+          <Route
+            path="/app/teacher"
+            element={
+              <RutaProtegida>
+                <RutaRol rolesPermitidos={['PROFESOR', 'DOCENTE']}>
+                  <LayoutProfesor />
+                </RutaRol>
+              </RutaProtegida>
+            }
+          >
+            <Route
+              path="panel"
+              element={<div>Panel Profesor</div>}
             />
           </Route>
 

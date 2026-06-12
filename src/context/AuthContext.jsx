@@ -7,6 +7,24 @@ import {
 
 const AuthContext = createContext(null);
 
+// Función para decodificar JWT
+function decodeToken(token) {
+  try {
+    const base64Url = token.split('.')[1];
+    const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+    const jsonPayload = decodeURIComponent(
+      atob(base64)
+        .split('')
+        .map((c) => '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2))
+        .join('')
+    );
+    return JSON.parse(jsonPayload);
+  } catch (error) {
+    console.error('Error decodificando token:', error);
+    return null;
+  }
+}
+
 export function AuthProvider({ children }) {
 
   const [user, setUser] = useState(null);
@@ -24,6 +42,21 @@ export function AuthProvider({ children }) {
 
     if (storedToken) {
       setToken(storedToken);
+
+      setUser(JSON.parse(storedUser));
+
+    } else if (storedToken) {
+      // Si solo hay token, decodificar y restaurar usuario
+      const decoded = decodeToken(storedToken);
+      if (decoded) {
+        setToken(storedToken);
+        const userProfile = {
+          email: decoded.sub || decoded.email,
+          rol: decoded.rol || decoded.role,
+          id: decoded.id
+        };
+        setUser(userProfile);
+      }
     }
 
   }, []);
@@ -91,6 +124,7 @@ export function AuthProvider({ children }) {
 
   const logout = () => {
 
+    // Limpiar estado
     setUser(null);
     setToken(null);
     sessionStorage.removeItem('ldc_token');
