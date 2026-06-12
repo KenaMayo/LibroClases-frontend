@@ -8,7 +8,9 @@ import {
 import { AuthProvider } from './context/AuthContext';
 
 import RutaProtegida from './routes/RutaProtegida';
+import RutaRol from './routes/RutaRol';
 import LayoutAdministrador from './components/layout/LayoutAdministrador';
+import LayoutProfesor from './components/layout/LayoutProfesor';
 
 import LoginPage from './pages/login/login';
 
@@ -19,6 +21,11 @@ import GestionAsignaturas from './pages/administrador/GestionAsignaturas';
 import ListadoUsuariosCurso from './pages/administrador/ListadoUsuariosCurso';
 import Reportes from './pages/administrador/Reportes';
 import DetalleCurso from './pages/cursos/DetalleCurso';
+
+import PanelProfesor from './pages/teacher/PanelProfesor';
+import RegistroAsistencia from './pages/teacher/RegistroAsistencia';
+import RegistroNotas from './pages/teacher/RegistroNotas';
+import MensajesProfesor from './pages/teacher/MensajesProfesor';
 
 export default function App() {
   return (
@@ -34,7 +41,9 @@ export default function App() {
             path="/app/admin"
             element={
               <RutaProtegida>
-                <LayoutAdministrador />
+                <RutaRol roles={['ADMIN']}>
+                  <LayoutAdministrador />
+                </RutaRol>
               </RutaProtegida>
             }
           >
@@ -71,6 +80,37 @@ export default function App() {
             <Route
               path="reportes"
               element={<Reportes />}
+            />
+          </Route>
+
+          <Route
+            path="/app/teacher"
+            element={
+              <RutaProtegida>
+                <RutaRol roles={['PROFESOR']}>
+                  <LayoutProfesor />
+                </RutaRol>
+              </RutaProtegida>
+            }
+          >
+            <Route
+              path="panel"
+              element={<PanelProfesor />}
+            />
+
+            <Route
+              path="asistencia"
+              element={<RegistroAsistencia />}
+            />
+
+            <Route
+              path="notas"
+              element={<RegistroNotas />}
+            />
+
+            <Route
+              path="mensajes"
+              element={<MensajesProfesor />}
             />
           </Route>
 

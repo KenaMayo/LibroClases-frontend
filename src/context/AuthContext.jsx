@@ -13,167 +13,88 @@ export function AuthProvider({ children }) {
 
   const [token, setToken] = useState(null);
 
-  // =========================
-  // CARGAR SESIÓN
-  // =========================
-
   useEffect(() => {
 
-    const storedUser =
-      sessionStorage.getItem('ldc_user');
-
-    const storedToken =
-      sessionStorage.getItem('ldc_token');
+    const storedUser = sessionStorage.getItem('ldc_user');
+    const storedToken = sessionStorage.getItem('ldc_token');
 
     if (storedUser) {
-
-      setUser(
-        JSON.parse(storedUser)
-      );
+      setUser(JSON.parse(storedUser));
     }
 
     if (storedToken) {
-
       setToken(storedToken);
     }
 
   }, []);
 
-  // =========================
-  // LOGIN
-  // =========================
-
-  const login = async (
-    email,
-    password
-  ) => {
+  const login = async (email, password) => {
 
     try {
 
-      const API_URL =
-        import.meta.env.VITE_API_URL;
+      const API_URL = import.meta.env.VITE_API_URL;
 
-      console.log(
-        'API URL:',
-        API_URL
-      );
+      const headers = {
+        'Content-Type': 'application/json',
+        'ngrok-skip-browser-warning': 'true',
+      };
 
-      const res = await fetch(
-        `${API_URL}/auth/login`,
-        {
-          method: 'POST',
-
-          headers: {
-
-            'Content-Type':
-              'application/json',
-
-            // IMPORTANTE NGROK
-            'ngrok-skip-browser-warning':
-              'true'
-          },
-
-          body: JSON.stringify({
-            email,
-            password,
-          }),
-        }
-      );
-
-      console.log(
-        'RESPONSE:',
-        res
-      );
+      const res = await fetch(`${API_URL}/auth/login`, {
+        method: 'POST',
+        headers,
+        body: JSON.stringify({ email, password }),
+      });
 
       if (!res.ok) {
-
-        return {
-          success: false,
-          error:
-            'Credenciales incorrectas'
-        };
+        return { success: false, error: 'Credenciales incorrectas' };
       }
 
-      // =========================
-      // TOKEN JWT
-      // =========================
+      const jwt = await res.text();
 
-      const token =
-        await res.text();
+      sessionStorage.setItem('ldc_token', jwt);
+      setToken(jwt);
 
-      console.log(
-        'TOKEN:',
-        token
+      const usuariosRes = await fetch(`${API_URL}/usuarios`, { headers });
+
+      if (!usuariosRes.ok) {
+        return { success: false, error: 'No se pudo obtener el perfil del usuario' };
+      }
+
+      const usuarios = await usuariosRes.json();
+      const encontrado = usuarios.find(
+        (u) => u.email?.toLowerCase() === email.toLowerCase()
       );
 
-      // =========================
-      // GUARDAR TOKEN
-      // =========================
-
-      sessionStorage.setItem(
-        'ldc_token',
-        token
-      );
-
-      setToken(token);
-
-      // =========================
-      // PERFIL
-      // =========================
+      if (!encontrado) {
+        return { success: false, error: 'Usuario no encontrado' };
+      }
 
       const profile = {
-
-        email,
-
-        rol:
-          email ===
-          'admin@colegio.com'
-            ? 'ADMIN'
-            : 'USUARIO'
+        id: encontrado.id,
+        nombre: encontrado.nombre,
+        email: encontrado.email,
+        rol: encontrado.rol,
       };
 
-      // =========================
-      // GUARDAR USUARIO
-      // =========================
-
-      sessionStorage.setItem(
-        'ldc_user',
-        JSON.stringify(profile)
-      );
-
+      sessionStorage.setItem('ldc_user', JSON.stringify(profile));
       setUser(profile);
 
-      return {
-        success: true,
-        user: profile
-      };
+      return { success: true, user: profile };
 
     } catch (error) {
 
-      console.error(
-        'ERROR LOGIN:',
-        error
-      );
+      console.error('Error en login:', error);
 
-      return {
-        success: false,
-        error:
-          'No se pudo conectar al servidor'
-      };
+      return { success: false, error: 'No se pudo conectar al servidor' };
     }
   };
-
-  // =========================
-  // LOGOUT
-  // =========================
 
   const logout = () => {
 
     setUser(null);
-
     setToken(null);
-
-    sessionStorage.clear();
+    sessionStorage.removeItem('ldc_token');
+    sessionStorage.removeItem('ldc_user');
   };
 
   return (

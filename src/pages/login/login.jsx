@@ -63,14 +63,14 @@ export default function LoginPage() {
         return;
       }
 
-      // ADMIN
-      if (email === 'admin@colegio.com') {
+      const rol = result.user?.rol;
 
+      if (rol === 'ADMIN') {
         navigate('/app/admin/panel');
-
+      } else if (rol === 'PROFESOR') {
+        navigate('/app/teacher/panel');
       } else {
-
-        navigate('/app/admin/panel');
+        navigate('/');
       }
 
     } catch (err) {
