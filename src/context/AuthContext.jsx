@@ -7,6 +7,24 @@ import {
 
 const AuthContext = createContext(null);
 
+// Función para decodificar JWT
+function decodeToken(token) {
+  try {
+    const base64Url = token.split('.')[1];
+    const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+    const jsonPayload = decodeURIComponent(
+      atob(base64)
+        .split('')
+        .map((c) => '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2))
+        .join('')
+    );
+    return JSON.parse(jsonPayload);
+  } catch (error) {
+    console.error('Error decodificando token:', error);
+    return null;
+  }
+}
+
 export function AuthProvider({ children }) {
 
   const [user, setUser] = useState(null);
@@ -19,22 +37,30 @@ export function AuthProvider({ children }) {
 
   useEffect(() => {
 
-    const storedUser =
-      sessionStorage.getItem('ldc_user');
-
     const storedToken =
       sessionStorage.getItem('ldc_token');
 
-    if (storedUser) {
+    const storedUser =
+      sessionStorage.getItem('ldc_user');
 
-      setUser(
-        JSON.parse(storedUser)
-      );
-    }
-
-    if (storedToken) {
+    if (storedToken && storedUser) {
 
       setToken(storedToken);
+
+      setUser(JSON.parse(storedUser));
+
+    } else if (storedToken) {
+      // Si solo hay token, decodificar y restaurar usuario
+      const decoded = decodeToken(storedToken);
+      if (decoded) {
+        setToken(storedToken);
+        const userProfile = {
+          email: decoded.sub || decoded.email,
+          rol: decoded.rol || decoded.role,
+          id: decoded.id
+        };
+        setUser(userProfile);
+      }
     }
 
   }, []);
@@ -107,6 +133,21 @@ export function AuthProvider({ children }) {
       );
 
       // =========================
+      // DECODIFICAR TOKEN
+      // =========================
+
+      const decoded = decodeToken(token);
+      
+      if (!decoded) {
+        return {
+          success: false,
+          error: 'Token inválido'
+        };
+      }
+
+      console.log('DECODED TOKEN:', decoded);
+
+      // =========================
       // GUARDAR TOKEN
       // =========================
 
@@ -118,19 +159,19 @@ export function AuthProvider({ children }) {
       setToken(token);
 
       // =========================
-      // PERFIL
+      // CREAR PERFIL CON ROL DECODIFICADO
       // =========================
 
       const profile = {
 
-        email,
+        email: decoded.sub || email,
 
-        rol:
-          email ===
-          'admin@colegio.com'
-            ? 'ADMIN'
-            : 'USUARIO'
+        rol: decoded.rol || decoded.role || 'USUARIO',
+        
+        id: decoded.id
       };
+
+      console.log('PROFILE:', profile);
 
       // =========================
       // GUARDAR USUARIO
@@ -164,15 +205,18 @@ export function AuthProvider({ children }) {
   };
 
   // =========================
-  // LOGOUT
+  // LOGOUT - LIMPIEZA COMPLETA
   // =========================
 
   const logout = () => {
 
+    // Limpiar estado
     setUser(null);
-
     setToken(null);
 
+    // Limpiar sessionStorage completamente
+    sessionStorage.removeItem('ldc_token');
+    sessionStorage.removeItem('ldc_user');
     sessionStorage.clear();
   };
 

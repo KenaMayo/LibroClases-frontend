@@ -8,7 +8,9 @@ import {
 import { AuthProvider } from './context/AuthContext';
 
 import RutaProtegida from './routes/RutaProtegida';
+import RutaRol from './routes/RutaRol';
 import LayoutAdministrador from './components/layout/LayoutAdministrador';
+import LayoutProfesor from './components/layout/LayoutProfesor';
 
 import LoginPage from './pages/login/login';
 
@@ -30,11 +32,14 @@ export default function App() {
             element={<LoginPage />}
           />
 
+          {/* RUTAS ADMIN */}
           <Route
             path="/app/admin"
             element={
               <RutaProtegida>
-                <LayoutAdministrador />
+                <RutaRol rolesPermitidos={['ADMIN']}>
+                  <LayoutAdministrador />
+                </RutaRol>
               </RutaProtegida>
             }
           >
@@ -71,6 +76,23 @@ export default function App() {
             <Route
               path="reportes"
               element={<Reportes />}
+            />
+          </Route>
+
+          {/* RUTAS PROFESOR/DOCENTE */}
+          <Route
+            path="/app/teacher"
+            element={
+              <RutaProtegida>
+                <RutaRol rolesPermitidos={['PROFESOR', 'DOCENTE']}>
+                  <LayoutProfesor />
+                </RutaRol>
+              </RutaProtegida>
+            }
+          >
+            <Route
+              path="panel"
+              element={<div>Panel Profesor</div>}
             />
           </Route>
 

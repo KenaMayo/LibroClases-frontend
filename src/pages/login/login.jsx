@@ -63,14 +63,18 @@ export default function LoginPage() {
         return;
       }
 
-      // ADMIN
-      if (email === 'admin@colegio.com') {
+      // Navegar según el rol del usuario
+      const userRole = result.user?.rol?.toUpperCase();
+      
+      console.log('User role:', userRole);
 
+      if (userRole === 'ADMIN') {
         navigate('/app/admin/panel');
-
+      } else if (userRole === 'PROFESOR' || userRole === 'DOCENTE') {
+        navigate('/app/teacher/panel');
       } else {
-
-        navigate('/app/admin/panel');
+        // Para otros roles (estudiante, apoderado, etc)
+        navigate('/app/student/dashboard');
       }
 
     } catch (err) {

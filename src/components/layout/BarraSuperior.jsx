@@ -7,7 +7,11 @@ export default function BarraSuperior() {
 
   function handleLogout() {
     logout();
-    navigate('/');
+    // Pequeño delay para asegurar limpieza completa del estado
+    setTimeout(() => {
+      navigate('/');
+      window.location.reload(); // Forzar recarga para limpiar caché
+    }, 100);
   }
 
   return (
