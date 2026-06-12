@@ -1,7 +1,7 @@
 import { Navigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 
-export default function RutaRol({ roles, children }) {
+export default function RutaRol({ roles = [], children }) {
 
   const { user } = useAuth();
 

@@ -7,10 +7,10 @@ export default function BarraLateralProfesor() {
   const navigate = useNavigate();
 
   const menu = [
-    { nombre: 'Panel', ruta: '/app/profesor/panel' },
-    { nombre: 'Asistencia', ruta: '/app/profesor/asistencia' },
-    { nombre: 'Notas', ruta: '/app/profesor/notas' },
-    { nombre: 'Mensajes', ruta: '/app/profesor/mensajes' }
+    { nombre: 'Panel', ruta: '/app/teacher/panel' },
+    { nombre: 'Asistencia', ruta: '/app/teacher/asistencia' },
+    { nombre: 'Notas', ruta: '/app/teacher/notas' },
+    { nombre: 'Mensajes', ruta: '/app/teacher/mensajes' }
   ];
 
   function handleLogout() {

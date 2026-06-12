@@ -84,23 +84,6 @@ export default function App() {
             />
           </Route>
 
-          {/* RUTAS PROFESOR/DOCENTE */}
-          <Route
-            path="/app/teacher"
-            element={
-              <RutaProtegida>
-                <RutaRol rolesPermitidos={['PROFESOR', 'DOCENTE']}>
-                  <LayoutProfesor />
-                </RutaRol>
-              </RutaProtegida>
-            }
-          >
-            <Route
-              path="panel"
-              element={<div>Panel Profesor</div>}
-            />
-          </Route>
-
           <Route
             path="/app/teacher"
             element={
