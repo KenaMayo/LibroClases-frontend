@@ -3,12 +3,8 @@ const API =
 
 // HEADERS NGROK
 const headers = {
-
-  'Content-Type':
-    'application/json',
-
-  'ngrok-skip-browser-warning':
-    'true'
+  'Content-Type': 'application/json',
+  'ngrok-skip-browser-warning': 'true'
 };
 
 // =========================
@@ -25,9 +21,33 @@ export async function obtenerUsuarios() {
   );
 
   if (!res.ok) {
-
     throw new Error(
       'Error al obtener usuarios'
+    );
+  }
+
+  return await res.json();
+}
+
+// =========================
+// OBTENER ALUMNOS POR CURSO
+// =========================
+
+export async function obtenerUsuariosPorCurso(
+  cursoId
+) {
+
+  const res = await fetch(
+    `${API}/usuarios/curso/${cursoId}`,
+    {
+      headers
+    }
+  );
+
+  if (!res.ok) {
+
+    throw new Error(
+      'Error al obtener alumnos del curso'
     );
   }
 
@@ -46,17 +66,12 @@ export async function crearUsuario(
     `${API}/usuarios`,
     {
       method: 'POST',
-
       headers,
-
-      body: JSON.stringify(
-        usuario
-      ),
+      body: JSON.stringify(usuario),
     }
   );
 
   if (!res.ok) {
-
     throw new Error(
       'Error al crear usuario'
     );
@@ -78,17 +93,12 @@ export async function actualizarUsuario(
     `${API}/usuarios/${id}`,
     {
       method: 'PUT',
-
       headers,
-
-      body: JSON.stringify(
-        usuario
-      ),
+      body: JSON.stringify(usuario),
     }
   );
 
   if (!res.ok) {
-
     throw new Error(
       'Error al actualizar usuario'
     );
@@ -109,13 +119,11 @@ export async function eliminarUsuario(
     `${API}/usuarios/${id}`,
     {
       method: 'DELETE',
-
       headers
     }
   );
 
   if (!res.ok) {
-
     throw new Error(
       'Error al eliminar usuario'
     );

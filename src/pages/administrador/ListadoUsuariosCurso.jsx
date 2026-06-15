@@ -151,12 +151,15 @@ export default function ListadoUsuariosCurso() {
 
         <div className="card-body p-0">
 
-          <TablaUsuarios
-            usuarios={usuariosFiltrados}
-            onEliminar={(usuario) =>
-              setUsuarioEliminar(usuario)
-            }
-          />
+<TablaUsuarios
+  usuarios={usuariosFiltrados}
+  onEditar={(usuario) => {
+    console.log("Editar usuario", usuario);
+  }}
+  onEliminar={(usuario) =>
+    setUsuarioEliminar(usuario)
+  }
+/>
 
         </div>
 
